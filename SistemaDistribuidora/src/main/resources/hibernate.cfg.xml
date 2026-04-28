@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <!-- createDatabaseIfNotExist=true: el driver crea el schema si no existe -->
+        <property name="hibernate.connection.url">
+            jdbc:mysql://localhost:3306/distribuidora?serverTimezone=UTC
+        </property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">ciro123</property>
+
+        <!-- El dialecto se autodetecta en Hibernate 7; no hace falta especificarlo -->
+
+        <!-- Controla qué hace Hibernate con las tablas al iniciar:
+             create-drop → recrea las tablas al arrancar y las elimina al cerrar (demos)
+             create      → recrea las tablas al arrancar (borra datos previos)
+             update      → agrega columnas nuevas sin borrar datos existentes
+             validate    → verifica que las tablas coincidan con las entidades
+             none        → no toca el esquema (producción) -->
+        <property name="hibernate.hbm2ddl.auto">validate</property>
+
+        <!-- Imprime el SQL generado en consola, útil para aprender y depurar -->
+        <property name="hibernate.show_sql">true</property>
+        <property name="hibernate.format_sql">true</property>
+
+        <property name="hibernate.cache.use_second_level_cache">false</property>
+        <property name="hibernate.cache.use_query_cache">false</property>
+
+        <!-- Cada clase @Entity debe registrarse aquí -->
+        <mapping class="com.distribuidora.model.Proveedor"/>
+        <mapping class="com.distribuidora.model.Producto"/>
+
+    </session-factory>
+</hibernate-configuration>
