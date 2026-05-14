@@ -23,12 +23,14 @@ public class DistribuidoraRepositoryTest {
 
     @Before
     public void setUp() {
-        sessionFactory = new Configuration().configure().buildSessionFactory();
+        sessionFactory = new Configuration()
+                .configure("hibernate.cfg.xml")
+                .addAnnotatedClass(Proveedor.class)
+                .addAnnotatedClass(Producto.class)
+                .buildSessionFactory();
 
         session = sessionFactory.openSession();
-
         transaction = session.beginTransaction();
-
         repository = new DistribuidoraRepository(session);
     }
 
