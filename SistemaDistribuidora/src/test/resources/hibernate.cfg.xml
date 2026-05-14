@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+
+<hibernate-configuration>
+    <session-factory>
+
+        <!-- Driver de H2 -->
+        <property name="hibernate.connection.driver_class">
+            org.h2.Driver
+        </property>
+
+        <!-- Base en memoria -->
+        <property name="hibernate.connection.url">
+            jdbc:h2:mem:testdb
+        </property>
+
+        <!-- Usuario -->
+        <property name="hibernate.connection.username">sa</property>
+
+        <!-- Password -->
+        <property name="hibernate.connection.password"></property>
+
+        <!-- Dialecto -->
+        <property name="hibernate.dialect">
+            org.hibernate.dialect.H2Dialect
+        </property>
+
+        <!-- Crear tablas automáticamente -->
+        <property name="hibernate.hbm2ddl.auto">
+            create-drop
+        </property>
+
+        <!-- Mostrar SQL -->
+        <property name="hibernate.show_sql">
+            true
+        </property>
+
+        <!-- Entidades -->
+        <mapping class="com.distribuidora.model.Proveedor"/>
+        <mapping class="com.distribuidora.model.Producto"/>
+
+    </session-factory>
+</hibernate-configuration>

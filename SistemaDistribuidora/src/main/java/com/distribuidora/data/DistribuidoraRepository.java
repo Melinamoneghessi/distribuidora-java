@@ -64,7 +64,7 @@ public class DistribuidoraRepository {
             String hql = "FROM Producto p WHERE 1=1";
 
             if (categoria != null && !categoria.isEmpty()) {
-                hql += "AND p.categoria=:categoria";
+                hql += " AND p.categoria=:categoria";
             }
             if (precioMax != null) {
                 hql += " AND p.precioUnitario <= :precioMax";
