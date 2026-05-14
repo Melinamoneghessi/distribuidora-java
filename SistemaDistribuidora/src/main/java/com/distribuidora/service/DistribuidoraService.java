@@ -12,7 +12,7 @@ public class DistribuidoraService {
     private DistribuidoraRepository repository;
 
     private DistribuidoraService() {
-        this.repository = DistribuidoraRepository.getInstancia();
+        this.repository = new DistribuidoraRepository();
     }
 
     public static DistribuidoraService getInstancia() {
@@ -50,16 +50,16 @@ public class DistribuidoraService {
         System.out.println("Producto registrado correctamente");
     }
 
-    public void buscarProductos(String categoria, Double precioMax, Integer stockMin){
-        List<Producto> productos= repository.buscarProductos(categoria,precioMax,stockMin);
+    public void buscarProductos(String categoria, Double precioMax, Integer stockMin) {
+        List<Producto> productos = repository.buscarProductos(categoria, precioMax, stockMin);
 
-        if(productos.isEmpty()){
-            System.out.println("No se enontraron productos con esos filtros");
+        if (productos.isEmpty()) {
+            System.out.println("No se encontraron productos con esos filtros");
             return;
         }
 
         System.out.println("==PRODUCTOS ENCONTRADOS==");
-        for(Producto producto:productos){
+        for (Producto producto : productos) {
             System.out.println("ID: " + producto.getId());
             System.out.println("Nombre: " + producto.getNombre());
             System.out.println("Categoría: " + producto.getCategoria());
@@ -70,17 +70,17 @@ public class DistribuidoraService {
         }
     }
 
-    public void mostrarResumenPorProveedor(){
-        List<Object[]> resumen= repository.resumenPorProveedor();
+    public void mostrarResumenPorProveedor() {
+        List<Object[]> resumen = repository.resumenPorProveedor();
 
-        if(resumen.isEmpty()){
+        if (resumen.isEmpty()) {
             System.out.println("No hay productos cargados para mostrar resumen.");
             return;
         }
 
         System.out.println("==RESUMEN POR PROVEEDOR==");
-        for(Object[] fila: resumen){
-            Proveedor proveedor=(Proveedor) fila[0];
+        for (Object[] fila : resumen) {
+            Proveedor proveedor = (Proveedor) fila[0];
             Long cantidadProductos = (Long) fila[1];
             Long stockTotal = (Long) fila[2];
             Double valorTotal = (Double) fila[3];

@@ -8,21 +8,29 @@ import org.hibernate.Transaction;
 import java.util.List;
 
 public class DistribuidoraRepository {
-    private static DistribuidoraRepository instancia;
 
-    private DistribuidoraRepository() {
+    private final Session sessionExterna;
+
+    // Constructor para producción (sin Session externa)
+    public DistribuidoraRepository() {
+        this.sessionExterna = null;
     }
 
-    public static DistribuidoraRepository getInstancia() {
-        if (instancia == null) {
-            instancia = new DistribuidoraRepository();
-        }
-        return instancia;
+    // Constructor para tests (recibe Session de H2)
+    public DistribuidoraRepository(Session session) {
+        this.sessionExterna = session;
+    }
+
+    private boolean usaSessionExterna() {
+        return sessionExterna != null;
     }
 
     public void guardarProveedor(Proveedor proveedor) {
+        if (usaSessionExterna()) {
+            sessionExterna.persist(proveedor);
+            return;
+        }
         Transaction tx = null;
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             tx = session.beginTransaction();
             session.persist(proveedor);
@@ -34,16 +42,15 @@ public class DistribuidoraRepository {
     }
 
     public void guardarProducto(Producto producto) {
+        if (usaSessionExterna()) {
+            sessionExterna.persist(producto);
+            return;
+        }
         Transaction tx = null;
-
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
             tx = session.beginTransaction();
-
             session.persist(producto);
-
             tx.commit();
-
         } catch (Exception e) {
             if (tx != null) tx.rollback();
             e.printStackTrace();
@@ -51,6 +58,9 @@ public class DistribuidoraRepository {
     }
 
     public Proveedor buscarProveedorPorId(Long id) {
+        if (usaSessionExterna()) {
+            return sessionExterna.get(Proveedor.class, id);
+        }
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             return session.get(Proveedor.class, id);
         } catch (Exception e) {
@@ -60,11 +70,11 @@ public class DistribuidoraRepository {
     }
 
     public List<Producto> buscarProductos(String categoria, Double precioMax, Integer stockMin) {
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+        Session session = usaSessionExterna() ? sessionExterna : HibernateUtil.getSessionFactory().openSession();
+        try {
             String hql = "FROM Producto p WHERE 1=1";
-
             if (categoria != null && !categoria.isEmpty()) {
-                hql += " AND p.categoria=:categoria";
+                hql += " AND p.categoria = :categoria";
             }
             if (precioMax != null) {
                 hql += " AND p.precioUnitario <= :precioMax";
@@ -73,45 +83,41 @@ public class DistribuidoraRepository {
                 hql += " AND p.stock >= :stockMin";
             }
             var query = session.createQuery(hql, Producto.class);
-
             if (categoria != null && !categoria.isEmpty()) {
                 query.setParameter("categoria", categoria);
             }
-
             if (precioMax != null) {
                 query.setParameter("precioMax", precioMax);
             }
-
             if (stockMin != null) {
                 query.setParameter("stockMin", stockMin);
             }
-
             return query.getResultList();
-
         } catch (Exception e) {
             e.printStackTrace();
             return List.of();
+        } finally {
+            if (!usaSessionExterna()) session.close();
         }
     }
 
     public List<Object[]> resumenPorProveedor() {
-
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-
+        Session session = usaSessionExterna() ? sessionExterna : HibernateUtil.getSessionFactory().openSession();
+        try {
             String hql = """
-                        SELECT p.proveedor, 
-                               COUNT(p), 
-                               SUM(p.stock), 
-                               SUM(p.stock * p.precioUnitario)
-                        FROM Producto p
-                        GROUP BY p.proveedor
+                    SELECT p.proveedor,
+                           COUNT(p),
+                           SUM(p.stock),
+                           SUM(p.stock * p.precioUnitario)
+                    FROM Producto p
+                    GROUP BY p.proveedor
                     """;
-
             return session.createQuery(hql, Object[].class).getResultList();
-
         } catch (Exception e) {
             e.printStackTrace();
             return List.of();
+        } finally {
+            if (!usaSessionExterna()) session.close();
         }
     }
 }
