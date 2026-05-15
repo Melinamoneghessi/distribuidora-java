@@ -19,5 +19,7 @@ jobs:
           java-version: '21'
 
       - run: chmod +x gradlew
+        working-directory: SistemaDistribuidora
 
       - run: ./gradlew build
+        working-directory: SistemaDistribuidora
