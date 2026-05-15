@@ -21,8 +21,10 @@ dependencies {
 test {
     useJUnit()
     finalizedBy jacocoTestReport
+    jvmArgs '-Xss512k'
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
 }
-
 jacocoTestReport {
     dependsOn test
     reports {
